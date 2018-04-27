@@ -3,14 +3,11 @@
 #include <Servo.h>
 #include <LiquidCrystal.h>
 
-int servoPin = 50;
+int servoPin = 11;
 
 Servo servo;
 
 int servoAngle = 0;
-
-// Steps per Revolution for Small Stepper
-#define smallStepperStepsRev 32
 
 // Steps per Revolution for Big Stepper
 #define bigStepperStepsRev 200
@@ -24,8 +21,7 @@ int servoAngle = 0;
 #define btnNONE   5
 
 // Then the pins are entered here in the sequence 1-3-2-4 for proper sequencing
-Stepper smallStepper(smallStepperStepsRev, 30, 31, 32, 33);
-Stepper bigStepper(bigStepperStepsRev, 52, 53);
+Stepper bigStepper(bigStepperStepsRev, 2, 3);
 
 // setup for 'LCD Keypad Shield'
 LiquidCrystal lcd(8,9,4,5,6,7);
@@ -33,7 +29,6 @@ LiquidCrystal lcd(8,9,4,5,6,7);
 /*-----( Declare Variables )-----*/
 // Big Stepper 1 Revolution = 6400 Steps
 // Small Stepper 1 Revolution = 2048 Steps
-int smallRev    = 2048;
 int bigRev      = 6400;
 int revCounter  = 0;
 int bigStepCounter = 0;
@@ -88,11 +83,6 @@ int read_LCD_buttons(){               // read the buttons
 void moveBigStepper(int Steps2Take, int StepsSpeed) {
   bigStepper.setSpeed(StepsSpeed);
   bigStepper.step(Steps2Take);
-}
-
-void moveSmallStepper(int Steps2Take, int StepsSpeed) {
-  smallStepper.setSpeed(StepsSpeed);
-  smallStepper.step(Steps2Take);
 }
 
 void loop()
