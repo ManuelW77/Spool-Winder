@@ -170,7 +170,7 @@ void linksrum(unsigned int motorSpeed)
   digitalWrite(motorPin4, LOW);
   delayMicroseconds(motorSpeed);
 
-  // 4
+  // 4 
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, HIGH);
   digitalWrite(motorPin3, HIGH);
