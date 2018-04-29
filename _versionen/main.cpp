@@ -1,9 +1,13 @@
 #include <Arduino.h>
 #include <Stepper.h>
+#include <Servo.h>
 #include <LiquidCrystal.h>
 
-// Steps per Revolution for Small Stepper
-#define smallStepperStepsRev 32
+int servoPin = 11;
+
+Servo servo;
+
+int servoAngle = 0;
 
 // Steps per Revolution for Big Stepper
 #define bigStepperStepsRev 200
@@ -17,8 +21,7 @@
 #define btnNONE   5
 
 // Then the pins are entered here in the sequence 1-3-2-4 for proper sequencing
-Stepper smallStepper(smallStepperStepsRev, 30, 31, 32, 33);
-Stepper bigStepper(bigStepperStepsRev, 52, 53);
+Stepper bigStepper(bigStepperStepsRev, 2, 3);
 
 // setup for 'LCD Keypad Shield'
 LiquidCrystal lcd(8,9,4,5,6,7);
@@ -26,7 +29,6 @@ LiquidCrystal lcd(8,9,4,5,6,7);
 /*-----( Declare Variables )-----*/
 // Big Stepper 1 Revolution = 6400 Steps
 // Small Stepper 1 Revolution = 2048 Steps
-int smallRev    = 2048;
 int bigRev      = 6400;
 int revCounter  = 0;
 int bigStepCounter = 0;
@@ -36,11 +38,16 @@ int adc_key_in  = 0;
 bool startWind = false;
 int whenJump = 3;
 int wideJump = 10;
+float servoPos = 0;
 
 void setup()
 {
   Serial.begin(115200);
   Serial.print("Program Start");
+
+  servo.attach(servoPin);
+  servo.write(servoPos);
+
   // set up the LCD //////////////////////
   lcd.begin(2, 16); // Set the size of the LCD
   lcd.clear(); // Clear the screen
@@ -78,27 +85,21 @@ void moveBigStepper(int Steps2Take, int StepsSpeed) {
   bigStepper.step(Steps2Take);
 }
 
-void moveSmallStepper(int Steps2Take, int StepsSpeed) {
-  smallStepper.setSpeed(StepsSpeed);
-  smallStepper.step(Steps2Take);
-}
-
 void loop()
 {
-  //lcd.setCursor(0,1);             // move to the begining of the second line
   lcd_key_prev = lcd_key;
   lcd_key = read_LCD_buttons();   // read the buttons
 
   if (lcd_key != lcd_key_prev) {
     switch (lcd_key){
         case btnRIGHT:{
-              wideJump += 1;
+              wideJump += 10;
               lcd.setCursor(8,1); lcd.print("         ");
               lcd.setCursor(8,1); lcd.print("Wide:" + String(wideJump));
               break;
         }
         case btnLEFT:{
-              if (wideJump > 1) wideJump -= 1;
+              if (wideJump > 1) wideJump -= 10;
               lcd.setCursor(8,1); lcd.print("         ");
               lcd.setCursor(8,1); lcd.print("Wide:" + String(wideJump));
               break;
@@ -146,7 +147,15 @@ void loop()
     else {
       for (int i=0; i<=wideJump; i++) {
         moveBigStepper(1, 1000);
-        moveSmallStepper(1, 500);
+
+        if (servoPos >= 170.00) {
+          servoPos = 0;
+        }
+        else {
+          servoPos +=0.1;
+        }
+        servo.write(servoPos);
+        Serial.println(servoPos);
       }
       revCounter = 0;
     }

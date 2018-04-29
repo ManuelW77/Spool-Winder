@@ -1,13 +1,6 @@
 #include <Arduino.h>
 #include <Stepper.h>
-#include <Servo.h>
 #include <LiquidCrystal.h>
-
-int servoPin = 11;
-
-Servo servo;
-
-int servoAngle = 0;
 
 // Steps per Revolution for Big Stepper
 #define bigStepperStepsRev 200
@@ -20,11 +13,21 @@ int servoAngle = 0;
 #define btnSELECT 4
 #define btnNONE   5
 
-// Then the pins are entered here in the sequence 1-3-2-4 for proper sequencing
-Stepper bigStepper(bigStepperStepsRev, 2, 3);
+unsigned int lowSpeed  = 10000; // Notabene: nicht über 16000
+unsigned int highSpeed =  1000;
+
 
 // setup for 'LCD Keypad Shield'
 LiquidCrystal lcd(8,9,4,5,6,7);
+
+// Then the pins are entered here in the sequence 1-3-2-4 for proper sequencing
+Stepper bigStepper(bigStepperStepsRev, 20, 21);
+
+// Setup small Stepper
+const int motorPin1 = 51;  // Blue   - In 1
+const int motorPin2 = 52;  // Pink   - In 2
+const int motorPin3 = 53; // Yellow - In 3
+const int motorPin4 = 54; // Orange - In 4
 
 /*-----( Declare Variables )-----*/
 // Big Stepper 1 Revolution = 6400 Steps
@@ -45,8 +48,10 @@ void setup()
   Serial.begin(115200);
   Serial.print("Program Start");
 
-  servo.attach(servoPin);
-  servo.write(servoPos);
+  pinMode(motorPin1, OUTPUT);
+  pinMode(motorPin2, OUTPUT);
+  pinMode(motorPin3, OUTPUT);
+  pinMode(motorPin4, OUTPUT);
 
   // set up the LCD //////////////////////
   lcd.begin(2, 16); // Set the size of the LCD
@@ -83,6 +88,129 @@ int read_LCD_buttons(){               // read the buttons
 void moveBigStepper(int Steps2Take, int StepsSpeed) {
   bigStepper.setSpeed(StepsSpeed);
   bigStepper.step(Steps2Take);
+}
+
+void rechtsrum(unsigned int motorSpeed)
+{ // 1
+  digitalWrite(motorPin4, HIGH);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin1, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 2
+  digitalWrite(motorPin4, HIGH);
+  digitalWrite(motorPin3, HIGH);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin1, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 3
+  digitalWrite(motorPin4, LOW);
+  digitalWrite(motorPin3, HIGH);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin1, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 4
+  digitalWrite(motorPin4, LOW);
+  digitalWrite(motorPin3, HIGH);
+  digitalWrite(motorPin2, HIGH);
+  digitalWrite(motorPin1, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 5
+  digitalWrite(motorPin4, LOW);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin2, HIGH);
+  digitalWrite(motorPin1, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 6
+  digitalWrite(motorPin4, LOW);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin2, HIGH);
+  digitalWrite(motorPin1, HIGH);
+  delayMicroseconds(motorSpeed);
+
+  // 7
+  digitalWrite(motorPin4, LOW);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin1, HIGH);
+  delayMicroseconds(motorSpeed);
+
+  // 8
+  digitalWrite(motorPin4, HIGH);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin1, HIGH);
+  delayMicroseconds(motorSpeed);
+}
+
+void linksrum(unsigned int motorSpeed)
+{ // 1
+  digitalWrite(motorPin1, HIGH);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin4, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 2
+  digitalWrite(motorPin1, HIGH);
+  digitalWrite(motorPin2, HIGH);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin4, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 3
+  digitalWrite(motorPin1, LOW);
+  digitalWrite(motorPin2, HIGH);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin4, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 4
+  digitalWrite(motorPin1, LOW);
+  digitalWrite(motorPin2, HIGH);
+  digitalWrite(motorPin3, HIGH);
+  digitalWrite(motorPin4, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 5
+  digitalWrite(motorPin1, LOW);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin3, HIGH);
+  digitalWrite(motorPin4, LOW);
+  delayMicroseconds(motorSpeed);
+
+  // 6
+  digitalWrite(motorPin1, LOW);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin3, HIGH);
+  digitalWrite(motorPin4, HIGH);
+  delayMicroseconds(motorSpeed);
+
+  // 7
+  digitalWrite(motorPin1, LOW);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin4, HIGH);
+  delayMicroseconds(motorSpeed);
+
+  // 8
+  digitalWrite(motorPin1, HIGH);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin4, HIGH);
+  delayMicroseconds(motorSpeed);
+}
+
+void stop()
+{ digitalWrite(motorPin4, LOW);
+  digitalWrite(motorPin3, LOW);
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin1, LOW);
 }
 
 void loop()
@@ -148,14 +276,7 @@ void loop()
       for (int i=0; i<=wideJump; i++) {
         moveBigStepper(1, 1000);
 
-        if (servoPos >= 170.00) {
-          servoPos = 0;
-        }
-        else {
-          servoPos +=0.1;
-        }
-        servo.write(servoPos);
-        Serial.println(servoPos);
+        rechtsrum(lowSpeed);
       }
       revCounter = 0;
     }
