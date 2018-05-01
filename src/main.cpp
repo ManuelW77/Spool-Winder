@@ -13,7 +13,7 @@
 #define btnSELECT 4
 #define btnNONE   5
 
-unsigned int lowSpeed  = 10000; // Notabene: nicht über 16000
+unsigned int lowSpeed  = 6000; // Notabene: nicht über 16000
 unsigned int highSpeed =  1000;
 
 
@@ -21,13 +21,16 @@ unsigned int highSpeed =  1000;
 LiquidCrystal lcd(8,9,4,5,6,7);
 
 // Then the pins are entered here in the sequence 1-3-2-4 for proper sequencing
-Stepper bigStepper(bigStepperStepsRev, 20, 21);
+Stepper bigStepper(bigStepperStepsRev, 30, 31);
 
 // Setup small Stepper
-const int motorPin1 = 51;  // Blue   - In 1
-const int motorPin2 = 52;  // Pink   - In 2
-const int motorPin3 = 53; // Yellow - In 3
-const int motorPin4 = 54; // Orange - In 4
+const int motorPin1 = 32;  // Blue   - In 1
+const int motorPin2 = 34;  // Pink   - In 2
+const int motorPin3 = 36; // Yellow - In 3
+const int motorPin4 = 38; // Orange - In 4
+
+// Setup Endstop
+const int endStop = 33;
 
 /*-----( Declare Variables )-----*/
 // Big Stepper 1 Revolution = 6400 Steps
@@ -42,6 +45,8 @@ bool startWind = false;
 int whenJump = 3;
 int wideJump = 10;
 float servoPos = 0;
+bool goLeft = true;
+int leftSteps = 0;
 
 void setup()
 {
@@ -52,6 +57,8 @@ void setup()
   pinMode(motorPin2, OUTPUT);
   pinMode(motorPin3, OUTPUT);
   pinMode(motorPin4, OUTPUT);
+
+  pinMode(endStop, INPUT);
 
   // set up the LCD //////////////////////
   lcd.begin(2, 16); // Set the size of the LCD
@@ -170,7 +177,7 @@ void linksrum(unsigned int motorSpeed)
   digitalWrite(motorPin4, LOW);
   delayMicroseconds(motorSpeed);
 
-  // 4 
+  // 4
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, HIGH);
   digitalWrite(motorPin3, HIGH);
@@ -264,7 +271,7 @@ void loop()
 
   if (startWind == true) {
     if (revCounter < whenJump) {
-      moveBigStepper(1, 1000);
+      moveBigStepper(1, 500);
 
       bigStepCounter++;
       if (bigStepCounter == bigRev) {
@@ -273,11 +280,33 @@ void loop()
       }
     }
     else {
-      for (int i=0; i<=wideJump; i++) {
-        moveBigStepper(1, 1000);
-
-        rechtsrum(lowSpeed);
+      // Endstop auslesen und Richtung bestimmen
+      if (digitalRead(endStop) == false) {
+        goLeft = false;
       }
+      else if (goLeft == true) {
+        leftSteps++;
+      }
+
+      for (int i=0; i<=wideJump; i++) {
+        moveBigStepper(1, 500);
+
+        if (goLeft == false && leftSteps > 0) {
+          rechtsrum(highSpeed);
+        }
+        else {
+          linksrum(highSpeed);
+        }
+      }
+
+      if (goLeft == false && leftSteps > 0) {
+        leftSteps--;
+      }
+      if (goLeft == false && leftSteps == 0) {
+        goLeft = true;
+      }
+
+      Serial.println(leftSteps);
       revCounter = 0;
     }
   }
