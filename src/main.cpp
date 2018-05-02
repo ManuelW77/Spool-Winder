@@ -35,18 +35,19 @@ const int endStop = 33;
 // Big Stepper 1 Revolution = 6400 Steps
 // Small Stepper 1 Revolution = 2048 Steps
 int bigRev      = 6400; // Schritte für eine Umdrehung
+int whenJump = 1; // Voreinstellung nach wie viel Umdrehungen gesprungen wird
+int wideJump = 8; // Voreinstellung wie weit gesprungen wird
+int farToJump = 1; // set Stepweite auf dem Display
+
 int revCounter  = 0;
 int bigStepCounter = 0;
 int lcd_key     = 0;
 int lcd_key_prev = 0;
 int adc_key_in  = 0;
 bool startWind = false;
-int whenJump = 1; // Voreinstellung nach wie viel Umdrehungen gesprungen wird
-int wideJump = 4; // Voreinstellung wie weit gesprungen wird
 float servoPos = 0;
 bool goLeft = true;
 int leftSteps = 0;
-int farToJump = 1; // set Stepweite auf dem Display
 
 void setup() {
   Serial.begin(115200);
