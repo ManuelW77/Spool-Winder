@@ -48,7 +48,7 @@ bool startWind = false;
 float servoPos = 0;
 bool goLeft = true;
 int leftSteps = 0;
-float spoolLenght = 0.0;
+float spoolLength = 0.0;
 
 void setup() {
   Serial.begin(115200);
@@ -78,7 +78,7 @@ void setup() {
   lcd.setCursor(0,1);
   lcd.print("Wide:" + String(wideJump));
   lcd.setCursor(10,1);
-  lcd.print(String(spoolLenght) + "m");
+  lcd.print(String(spoolLength) + "m");
 }
 
 int read_LCD_buttons() {
@@ -312,9 +312,9 @@ void loop()
 
       Serial.println(leftSteps);
       revCounter = 0;
-      spoolLenght += 0.07;
+      spoolLength += 0.07;
       lcd.setCursor(10,1); lcd.print("      ");
-      lcd.setCursor(10,1); lcd.print(String(spoolLenght) + "m");
+      lcd.setCursor(10,1); lcd.print(String(spoolLength) + "m");
     }
   }
 }
