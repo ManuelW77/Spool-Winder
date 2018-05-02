@@ -16,7 +16,6 @@
 unsigned int lowSpeed  = 6000; // Notabene: nicht über 16000
 unsigned int highSpeed =  1000;
 
-
 // setup for 'LCD Keypad Shield'
 LiquidCrystal lcd(8,9,4,5,6,7);
 
@@ -35,21 +34,21 @@ const int endStop = 33;
 /*-----( Declare Variables )-----*/
 // Big Stepper 1 Revolution = 6400 Steps
 // Small Stepper 1 Revolution = 2048 Steps
-int bigRev      = 6400;
+int bigRev      = 6400; // Schritte für eine Umdrehung
 int revCounter  = 0;
 int bigStepCounter = 0;
 int lcd_key     = 0;
 int lcd_key_prev = 0;
 int adc_key_in  = 0;
 bool startWind = false;
-int whenJump = 3;
-int wideJump = 10;
+int whenJump = 1; // Voreinstellung nach wie viel Umdrehungen gesprungen wird
+int wideJump = 4; // Voreinstellung wie weit gesprungen wird
 float servoPos = 0;
 bool goLeft = true;
 int leftSteps = 0;
+int farToJump = 1; // set Stepweite auf dem Display
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.print("Program Start");
 
@@ -78,8 +77,8 @@ void setup()
   lcd.print("Wide:" + String(wideJump));
 }
 
-int read_LCD_buttons(){               // read the buttons
-    adc_key_in = analogRead(0);       // read the value from the sensor
+int read_LCD_buttons() {
+    adc_key_in = analogRead(0); // read the value from the sensor
 
     if (adc_key_in > 1000) return btnNONE;
 
@@ -89,7 +88,7 @@ int read_LCD_buttons(){               // read the buttons
     if (adc_key_in < 555)  return btnLEFT;
     if (adc_key_in < 790)  return btnSELECT;
 
-    return btnNONE;                // when all others fail, return this.
+    return btnNONE; // when all others fail, return this.
 }
 
 void moveBigStepper(int Steps2Take, int StepsSpeed) {
@@ -97,8 +96,8 @@ void moveBigStepper(int Steps2Take, int StepsSpeed) {
   bigStepper.step(Steps2Take);
 }
 
-void rechtsrum(unsigned int motorSpeed)
-{ // 1
+void rechtsrum(unsigned int motorSpeed) {
+  // 1
   digitalWrite(motorPin4, HIGH);
   digitalWrite(motorPin3, LOW);
   digitalWrite(motorPin2, LOW);
@@ -155,8 +154,8 @@ void rechtsrum(unsigned int motorSpeed)
   delayMicroseconds(motorSpeed);
 }
 
-void linksrum(unsigned int motorSpeed)
-{ // 1
+void linksrum(unsigned int motorSpeed) {
+  // 1
   digitalWrite(motorPin1, HIGH);
   digitalWrite(motorPin2, LOW);
   digitalWrite(motorPin3, LOW);
@@ -213,8 +212,8 @@ void linksrum(unsigned int motorSpeed)
   delayMicroseconds(motorSpeed);
 }
 
-void stop()
-{ digitalWrite(motorPin4, LOW);
+void stop() {
+  digitalWrite(motorPin4, LOW);
   digitalWrite(motorPin3, LOW);
   digitalWrite(motorPin2, LOW);
   digitalWrite(motorPin1, LOW);
@@ -228,13 +227,13 @@ void loop()
   if (lcd_key != lcd_key_prev) {
     switch (lcd_key){
         case btnRIGHT:{
-              wideJump += 10;
+              wideJump += farToJump;
               lcd.setCursor(8,1); lcd.print("         ");
               lcd.setCursor(8,1); lcd.print("Wide:" + String(wideJump));
               break;
         }
         case btnLEFT:{
-              if (wideJump > 1) wideJump -= 10;
+              if (wideJump > 1) wideJump -= farToJump;
               lcd.setCursor(8,1); lcd.print("         ");
               lcd.setCursor(8,1); lcd.print("Wide:" + String(wideJump));
               break;
@@ -262,6 +261,7 @@ void loop()
               }
               else {
                 startWind = false;
+                stop();
                 lcd.print("Stopping...");
               }
               break;
