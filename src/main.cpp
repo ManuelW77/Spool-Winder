@@ -13,7 +13,7 @@
 #define btnSELECT 4
 #define btnNONE   5
 
-unsigned int lowSpeed  = 6000; // Notabene: nicht über 16000
+unsigned int lowSpeed  = 6000;
 unsigned int highSpeed =  1000;
 
 // setup for 'LCD Keypad Shield'
@@ -34,9 +34,9 @@ const int endStop = 33;
 /*-----( Declare Variables )-----*/
 // Big Stepper 1 Revolution = 6400 Steps
 // Small Stepper 1 Revolution = 2048 Steps
-int bigRev      = 6400; // Schritte für eine Umdrehung
+int bigRev   = 1600; // 6400 Schritte für eine Umdrehung
 int whenJump = 1; // Voreinstellung nach wie viel Umdrehungen gesprungen wird
-int wideJump = 8; // Voreinstellung wie weit gesprungen wird
+int wideJump = 2; // Voreinstellung wie weit gesprungen wird
 int farToJump = 1; // set Stepweite auf dem Display
 
 int revCounter  = 0;
@@ -263,7 +263,7 @@ void loop()
               else {
                 startWind = false;
                 stop();
-                lcd.print("Stopping...");
+                lcd.print("Pause...");
               }
               break;
         }
@@ -303,7 +303,7 @@ void loop()
       if (goLeft == false && leftSteps > 0) {
         leftSteps--;
       }
-      if (goLeft == false && leftSteps == 0) {
+      if (goLeft == false && leftSteps <= 0) {
         goLeft = true;
       }
 
