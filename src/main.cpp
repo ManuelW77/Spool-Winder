@@ -48,6 +48,7 @@ bool startWind = false;
 float servoPos = 0;
 bool goLeft = true;
 int leftSteps = 0;
+float spoolLenght = 0.0;
 
 void setup() {
   Serial.begin(115200);
@@ -72,10 +73,12 @@ void setup() {
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("Waiting...");
+  //lcd.setCursor(0,1);
+  //lcd.print("Turn:" + String(whenJump));
   lcd.setCursor(0,1);
-  lcd.print("Turn:" + String(whenJump));
-  lcd.setCursor(8,1);
   lcd.print("Wide:" + String(wideJump));
+  lcd.setCursor(10,1);
+  lcd.print(String(spoolLenght) + "m");
 }
 
 int read_LCD_buttons() {
@@ -229,26 +232,26 @@ void loop()
     switch (lcd_key){
         case btnRIGHT:{
               wideJump += farToJump;
-              lcd.setCursor(8,1); lcd.print("         ");
-              lcd.setCursor(8,1); lcd.print("Wide:" + String(wideJump));
+              lcd.setCursor(0,1); lcd.print("         ");
+              lcd.setCursor(0,1); lcd.print("Wide:" + String(wideJump));
               break;
         }
         case btnLEFT:{
               if (wideJump > 1) wideJump -= farToJump;
-              lcd.setCursor(8,1); lcd.print("         ");
-              lcd.setCursor(8,1); lcd.print("Wide:" + String(wideJump));
+              lcd.setCursor(0,1); lcd.print("         ");
+              lcd.setCursor(0,1); lcd.print("Wide:" + String(wideJump));
               break;
         }
         case btnUP:{
-              whenJump += 1;
-              lcd.setCursor(0,1); lcd.print("       ");
-              lcd.setCursor(0,1); lcd.print("Turn:" + String(whenJump));
+              //whenJump += 1;
+              //lcd.setCursor(0,1); lcd.print("       ");
+              //lcd.setCursor(0,1); lcd.print("Turn:" + String(whenJump));
               break;
         }
         case btnDOWN:{
-              if (whenJump > 1) whenJump -= 1;
-              lcd.setCursor(0,1); lcd.print("       ");
-              lcd.setCursor(0,1); lcd.print("Turn:" + String(whenJump));
+              //if (whenJump > 1) whenJump -= 1;
+              //lcd.setCursor(0,1); lcd.print("       ");
+              //lcd.setCursor(0,1); lcd.print("Turn:" + String(whenJump));
               break;
         }
         case btnSELECT:{
@@ -309,6 +312,9 @@ void loop()
 
       Serial.println(leftSteps);
       revCounter = 0;
+      spoolLenght += 0.07;
+      lcd.setCursor(10,1); lcd.print("      ");
+      lcd.setCursor(10,1); lcd.print(String(spoolLenght) + "m");
     }
   }
 }
